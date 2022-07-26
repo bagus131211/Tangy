@@ -12,11 +12,6 @@
     //[Parameter]
     //public string MaxLength { get; set; } = "10";
 
-    [Parameter]
-    public Dictionary<string, object> InputAttributes { get; set; } = new()
-        {
-            { "required", "required" },
-            { "placeholder", "Enter your name" },
-            { "maxLength", 10 }
-        };
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> InputAttributes { get; set; } = new();
 }
