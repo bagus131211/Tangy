@@ -3,11 +3,13 @@
 <h3>Parent Child Relation</h3>
 
 @*<_Child OnButtonClick="ShowMessage" Title="This title passed as parameter from Parent">Render Fragment from Parent</_Child>*@
-<CascadingValue Value="@messageForGrandChild">
-    <_Child OnButtonClick="ShowMessage" Title="This title passed as parameter from Parent">
-        <ChildContent>Render Fragment from Parent! WooHooo!!!</ChildContent>
-        <DangerChildContent>Danger Render Fragment from Parent! WooHooo!!!</DangerChildContent>
-    </_Child>
+<CascadingValue Value="@messageForGrandChild" Name="message">
+    <CascadingValue Value="@luckyNumber" Name="lucky">
+        <_Child OnButtonClick="ShowMessage" Title="This title passed as parameter from Parent">
+            <ChildContent>Render Fragment from Parent! WooHooo!!!</ChildContent>
+            <DangerChildContent>Danger Render Fragment from Parent! WooHooo!!!</DangerChildContent>
+        </_Child>
+    </CascadingValue>
 </CascadingValue>
 <p><b>@messageText</b></p>
 <_Child Title="This is second child"></_Child>
@@ -18,6 +20,9 @@
 @code {
     string messageText = string.Empty;
     string messageForGrandChild = "This message is from your grand parent (Parent)";
+    string luckyNumber = "7";
+    /*if multiple cascading parameter and type is different
+    int luckyNumber = 7;*/
 
     void ShowMessage() => messageText = "Tangy button click from Child";
 }
