@@ -28,8 +28,8 @@
 
     async Task TestConfirmBox() => confirmResult = await _jsRuntime.InvokeAsync<bool>("confirm", confirmMessage);
 
-    async Task ToastrSuccess() => await _jsRuntime.InvokeVoidAsync("ShowToastr", "success", "Success!");
-  
-    async Task ToastrFailure() => await _jsRuntime.InvokeVoidAsync("ShowToastr", "error", "Failure!!!");
+    async Task ToastrSuccess() => await _jsRuntime.ToastrSuccess("Success!");
+
+    async Task ToastrFailure() => await _jsRuntime.ToastrFailure("Failure!!!");
 
 }
