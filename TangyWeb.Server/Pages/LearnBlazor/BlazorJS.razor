@@ -6,6 +6,10 @@
 <div class="row">
     <button class="btn btn-secondary" @onclick=@TestConfirmBox>Test Confirm Box</button>
 </div>
+<div class="row">
+    <button class="btn btn-success" @onclick=@ToastrSuccess>Toastr Success</button>
+    <button class="btn btn-danger" @onclick=@ToastrFailure>Toastr Failure</button>
+</div>
 
 <div class="row">
     @if (confirmResult)
@@ -23,4 +27,9 @@
     bool confirmResult;
 
     async Task TestConfirmBox() => confirmResult = await _jsRuntime.InvokeAsync<bool>("confirm", confirmMessage);
+
+    async Task ToastrSuccess() => await _jsRuntime.InvokeVoidAsync("ShowToastr", "success", "Success!");
+  
+    async Task ToastrFailure() => await _jsRuntime.InvokeVoidAsync("ShowToastr", "error", "Failure!!!");
+
 }
