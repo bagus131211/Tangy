@@ -1,6 +1,9 @@
 ﻿<div>
     <h4 class="text-primary pt-3">Another Child</h4>
-    <input id="name" @attributes="@InputAttributes" />
+    @*will use placeholder from child*@
+    <input id="name" @attributes="@InputAttributes" placeholder="Enter your name" />
+    @*will still use placeholder from parent*@
+    <input id="name" placeholder="Enter your name" @attributes="@InputAttributes" />
 </div>
 
 
