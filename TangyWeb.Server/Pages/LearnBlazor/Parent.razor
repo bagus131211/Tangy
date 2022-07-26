@@ -15,6 +15,11 @@
 
 @code {
     string messageText = string.Empty;
+    Dictionary<string, object> InputAttributes = new()
+        {
+            { "required", "required" },
+            { "placeholder", "placeholder from parent" },
+            { "maxLength", 5 }
+        };
     void ShowMessage() => messageText = "Tangy button click from Child";
-   
 }
