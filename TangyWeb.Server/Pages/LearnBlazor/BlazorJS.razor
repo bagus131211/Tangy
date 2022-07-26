@@ -4,12 +4,17 @@
 <h3>BlazorJS</h3>
 
 <div class="row">
-    <button class="btn btn-secondary" @onclick=@TestConfirmBox>Test Confirm Box</button>
+    <button class="btn btn-secondary wid-200 m-2" @onclick=@TestConfirmBox>Test Confirm Box</button>
 </div>
 <div class="row">
-    <button class="btn btn-success" @onclick=@ToastrSuccess>Toastr Success</button>
-    <button class="btn btn-danger" @onclick=@ToastrFailure>Toastr Failure</button>
+    <button class="btn btn-success wid-200 m-2" @onclick=@ToastrSuccess>Toastr Success</button>
+    <button class="btn btn-danger wid-200 m-2" @onclick=@ToastrFailure>Toastr Failure</button>
 </div>
+<div class="row">
+    <button class="btn btn-success wid-200 m-2" @onclick=@SwaSuccess>Sweet Alert Success</button>
+    <button class="btn btn-danger wid-200 m-2" @onclick=@SwaFailure>Sweet Alert Failure</button>
+</div>
+
 
 <div class="row">
     @if (confirmResult)
@@ -31,5 +36,10 @@
     async Task ToastrSuccess() => await _jsRuntime.ToastrSuccess("Success!");
 
     async Task ToastrFailure() => await _jsRuntime.ToastrFailure("Failure!!!");
+
+    async Task SwaSuccess() => await _jsRuntime.SwalSuccess("Task completed successfully!");
+
+    async Task SwaFailure() => await _jsRuntime.SwalFailure("Task failed!");
+
 
 }
