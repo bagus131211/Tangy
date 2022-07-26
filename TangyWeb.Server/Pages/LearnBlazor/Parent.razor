@@ -5,7 +5,7 @@
 @*<_Child OnButtonClick="ShowMessage" Title="This title passed as parameter from Parent">Render Fragment from Parent</_Child>*@
 <CascadingValue Value="@messageForGrandChild" Name="message">
     <CascadingValue Value="@luckyNumber" Name="lucky">
-        <_Child OnButtonClick="ShowMessage" Title="This title passed as parameter from Parent">
+        <_Child @ref=@child OnButtonClick="ShowMessage" Title="This title passed as parameter from Parent">
             <ChildContent>Render Fragment from Parent! WooHooo!!!</ChildContent>
             <DangerChildContent>Danger Render Fragment from Parent! WooHooo!!!</DangerChildContent>
         </_Child>
@@ -13,9 +13,15 @@
 </CascadingValue>
 <p><b>@messageText</b></p>
 <_Child Title="This is second child"></_Child>
+<div>
+    @*<_AnotherChild Placeholder="Placeholder from Parent"></_AnotherChild>*@
+    <_AnotherChild placeholder="placeholder from parent"></_AnotherChild>
+</div>
 
-@*<_AnotherChild Placeholder="Placeholder from Parent"></_AnotherChild>*@
-<_AnotherChild placeholder="placeholder from parent"></_AnotherChild>
+<div class="row">
+    <button class="btn btn-success" @onclick="()=>child.ToastrSuccess()">Show Toastr</button>
+</div>
+
 
 @code {
     string messageText = string.Empty;
@@ -23,6 +29,7 @@
     string luckyNumber = "7";
     /*if multiple cascading parameter and type is different
     int luckyNumber = 7;*/
+    _Child child;
 
     void ShowMessage() => messageText = "Tangy button click from Child";
 }
