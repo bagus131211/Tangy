@@ -1,0 +1,66 @@
+﻿@page "/learnBlazor/demoProduct"
+
+<h2 class="text-primary">Demo Product</h2>
+<p>Total Favourite : @favouriteCount</p>
+<p>Last Selected Product : @selectedProductName </p>
+<div class="border p-2 mt-2" style="background-color:azure">
+    <div class="row">
+        @foreach (var prod in products)
+        {
+            <_IndividualProduct Product="prod" OnFavouriteUpdated="FavouriteCountUpdate" OnSelectedProductNameUpdated=SelectedProductNameUpdate>
+                <RenderFragment1>#1</RenderFragment1>
+                <RenderFragment2>#2</RenderFragment2>
+            </_IndividualProduct>
+        }
+    </div>
+</div>
+
+@code {
+    List<DemoProduct> products = new();
+    int favouriteCount = 0;
+    string selectedProductName = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        products.AddRange(new List<DemoProduct>()
+        {
+            new ()
+            {
+                Id = 1,
+                Name = "Origami",
+                IsActive= false,
+                Price = 5000.75,
+                ProductProperties = new List<DemoProductProperties>()
+                {
+                    new() {Id = 1, Key="Color", Value="Pink"},
+                    new() { Id = 2, Key="Scent", Value="Fabric"},
+                    new() {Id = 3, Key="Size", Value="16cm x 16cm"}
+                }
+            },
+            new()
+            {
+                Id = 2,
+                Name = "Wooden Chair",
+                IsActive = true,
+                Price = 400000.22,
+                ProductProperties = new List<DemoProductProperties>()
+                {
+                    new() {Id = 1, Key = "Color", Value = "Red Oak"},
+                    new() {Id = 2, Key = "Scent", Value="Varnish"},
+                    new() {Id = 3, Key="Size", Value="45cm x 40cm x 80cm"}
+                }
+            }
+        });
+    }    
+
+    protected void FavouriteCountUpdate(bool isFavouriteSelected)
+    {
+        if (isFavouriteSelected)
+            favouriteCount++;
+        else
+            favouriteCount--;
+    }
+
+    protected void SelectedProductNameUpdate(string selectedProductName) => this.selectedProductName = selectedProductName;
+
+}
