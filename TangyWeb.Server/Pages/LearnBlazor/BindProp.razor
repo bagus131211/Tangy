@@ -1,0 +1,121 @@
+﻿@page "/learnBlazor/bindProp"
+<div class="col-12 pt-4">
+    <h2 class=text-success>Individual Product</h2>
+</div>
+<div class=row>
+    <div class="col-6 border p-3">
+        <h3 class="text-primary">Product Playground</h3><hr />
+        <div>
+            Is Active: <input type="checkbox" @bind="@product.IsActive" /><br />
+        </div>
+        <div>
+            Updated Price: <input type="number" @bind-value="@product.Price" @bind-value:event="oninput" /><br />
+        </div>
+        <div>
+            Product Properties: <select @bind="@selectedProperty">
+                @foreach (var properties in product.ProductProperties)
+                {
+                    <option value="@properties.Key">@properties.Key</option>
+                }
+            </select>
+        </div>
+        <div>
+            <EditForm Model="@product">
+                Test: <InputText @bind-Value="@staticValue" />
+            </EditForm>
+        </div>
+    </div>
+    <div class="col-6 border p-3">
+        <h3 class="text-primary">Product Summary</h3><hr />
+        Name: @product.Name<br />
+        Active: @product.IsActive<br />
+        Price: @product.Price<br />
+        This Product is: @(product.IsActive ? "Active" : "InActive")<br />
+        Selected Property: @selectedProperty<br />
+        Selected Property Value:
+        @if (!string.IsNullOrWhiteSpace(selectedProperty))
+        {
+            @product.ProductProperties.FirstOrDefault(f => f.Key == selectedProperty)?.Value
+        }
+    </div>
+</div>
+<div class="col-12 pt-4">
+    <h2 class="text-success">Product Table</h2>
+    <table class="table table-striped">
+        <tbody>
+            @foreach (var prod in products)
+            {
+                <tr>
+                    <td>
+                        <input type="text" @bind="prod.Name" @bind:event="oninput" />
+                    </td>
+                    <td>
+                        <input type="number" @bind="prod.Price" @bind:event="oninput" />
+                    </td>
+                    <td>
+                        <input type="checkbox" @bind="prod.IsActive" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <br />
+    <h3 class="text-primary">Product Table Summary</h3>
+    @foreach (var prod in products)
+    {
+        <p>@prod.Name [@prod.Price] is @(prod.IsActive ? "Active" : "InActive")</p>
+    }
+</div>
+
+@code {
+    string staticValue;
+    string selectedProperty = "";
+    List<DemoProduct> products = new();
+    DemoProduct product = new()
+        {
+            Id = 1,
+            Name = "Light Candle",
+            IsActive = true,
+            Price = 1100.50,
+            ProductProperties = new List<DemoProductProperties>()
+            {
+                new DemoProductProperties {Id = 1, Key = "Color", Value = "Green"},
+                new DemoProductProperties {Id = 2, Key = "Scent", Value = "Cotton Candy"},
+                new DemoProductProperties {Id = 3, Key = "Size", Value = "Tiny"}
+            }
+        };
+
+    protected override void OnInitialized()
+    {
+        staticValue = "some Value";
+        products.AddRange(new List<DemoProduct>()
+        {
+            new ()
+            {
+                Id = 1,
+                Name = "Origami",
+                IsActive= false,
+                Price = 5000.75,
+                ProductProperties = new List<DemoProductProperties>()
+                {
+                    new() {Id = 1, Key="Color", Value="Pink"},
+                    new() { Id = 2, Key="Scent", Value="Fabric"},
+                    new() {Id = 3, Key="Size", Value="16cm x 16cm"}
+                }
+            },
+            new()
+            {
+                Id = 2,
+                Name = "Wooden Chair",
+                IsActive = true,
+                Price = 400000.22,
+                ProductProperties = new List<DemoProductProperties>()
+                {
+                    new() {Id = 1, Key = "Color", Value = "Red Oak"},
+                    new() {Id = 2, Key = "Scent", Value="Varnish"},
+                    new() {Id = 3, Key="Size", Value="45cm x 40cm x 80cm"}
+                }
+            }
+        });
+    }    
+}
