@@ -8,6 +8,6 @@ namespace Tangy.Business.Respositories.Interface
         CategoryDTO Update(CategoryDTO category);
         int Delete(int Id);
         CategoryDTO GetById(int Id);
-        ICollection<CategoryDTO> GetAll();
+        IEnumerable<CategoryDTO> GetAll();
     }
 }
