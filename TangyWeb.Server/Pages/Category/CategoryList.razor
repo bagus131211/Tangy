@@ -1,0 +1,65 @@
+﻿@page "/category"
+
+@inject ICategoryRepository _categoryRepository
+
+<div class="row mt-4">
+    <div class="col-6">
+        <h4 class="card-title text-primary">Category</h4>
+    </div>
+    <div class="col-4 offset-2">
+        <a href="category/create" class="btn btn-primary form-control">Add new category</a>
+    </div>
+    <div class="col-12 py-4">
+        @if (categories.Any())
+        {
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in categories)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td><NavLink href=@($"/category/edit/{item.Id}") class="btn btn-primary">Edit</NavLink></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            if (isLoading)
+            {
+                <div class="text-center">
+                    <img src="/images/gear.gif" />
+                </div>
+            }
+            else
+            {
+                <p>No records found.</p>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    IEnumerable<CategoryDTO> categories = new List<CategoryDTO>();
+    bool isLoading = true;
+
+    //protected override void OnInitialized()
+    //    => categories = _categoryRepository.GetAll();
+
+    protected override async Task OnInitializedAsync() 
+        => await Task.Run(LoadCategories);
+
+    void LoadCategories()
+    { 
+        categories = _categoryRepository.GetAll();
+        isLoading = false;
+    }
+
+}

@@ -38,9 +38,9 @@ namespace Tangy.Business.Respositories
             return 0;
         }
 
-        public ICollection<CategoryDTO> GetAll()
+        public IEnumerable<CategoryDTO> GetAll()
         {
-            return _mapper.Map<ICollection<Category>, ICollection<CategoryDTO>>((ICollection<Category>)_context.Categories);
+            return _mapper.Map<IEnumerable<Category>, IEnumerable<CategoryDTO>>(_context.Categories);
         }
 
         public CategoryDTO GetById(int Id)
