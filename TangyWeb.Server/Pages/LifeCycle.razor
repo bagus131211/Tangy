@@ -4,10 +4,12 @@
 
 <p role="status">Current count: @currentCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button><br /><br />
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<br />
+<br />
 
 <div class="border">
-    <_LifeCycleChild></_LifeCycleChild>
+    <_LifeCycleChild CountValue=@currentCount></_LifeCycleChild>
 </div>
 
 @foreach (var item in EventType)
@@ -25,11 +27,17 @@
         currentCount++;
     }
 
-    protected override void OnInitialized() => EventType.Add("OnInitialized called");
+    protected override void OnInitialized()
+        => EventType.Add("OnInitialized called");
 
-    protected override async Task OnInitializedAsync() 
-    {
-        EventType.Add("OnInitializedAsync called");
-        await Task.Delay(1000);
-    }
+    protected override async Task OnInitializedAsync()
+        => await Task.Run(() => EventType.Add("OnInitializedAsync called"));
+
+    protected override void OnParametersSet()
+        => EventType.Add("OnParameterSet called");
+
+    protected override async Task OnParametersSetAsync()
+        => await Task.Run(() => EventType.Add("OnParameterSetAsync called"));
+
+
 }
