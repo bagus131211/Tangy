@@ -39,5 +39,17 @@
     protected override async Task OnParametersSetAsync()
         => await Task.Run(() => EventType.Add("OnParameterSetAsync called"));
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            currentCount = 11;
+        else
+            currentCount = 99;
+        EventType.Add("OnAfterRender called");
+    } 
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+        => await Task.Run(() => EventType.Add("OnAfterRenderAsync called"));
+
 
 }
