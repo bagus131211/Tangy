@@ -36,13 +36,13 @@
         => EventType.Add("OnInitialized called");
 
     protected override async Task OnInitializedAsync()
-        => await Task.Run(() => EventType.Add("OnInitializedAsync called"));
+        => EventType.Add("OnInitializedAsync called");
 
     protected override void OnParametersSet()
         => EventType.Add("OnParameterSet called");
 
     protected override async Task OnParametersSetAsync()
-        => await Task.Run(() => EventType.Add("OnParameterSetAsync called"));
+        => EventType.Add("OnParameterSetAsync called");
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -54,7 +54,7 @@
     } 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
-        => await Task.Run(() => EventType.Add("OnAfterRenderAsync called"));
+        => EventType.Add("OnAfterRenderAsync called");
 
     protected override bool ShouldRender()
     {
