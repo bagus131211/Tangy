@@ -4,10 +4,10 @@ namespace Tangy.Business.Respositories.Interface
 {
     public interface ICategoryRepository
     {
-        CategoryDTO Create(CategoryDTO category);
-        CategoryDTO Update(CategoryDTO category);
-        int Delete(int Id);
-        CategoryDTO GetById(int Id);
-        IEnumerable<CategoryDTO> GetAll();
+        Task<CategoryDTO> Create(CategoryDTO category);
+        Task<CategoryDTO> Update(CategoryDTO category);
+        Task<int> Delete(int Id);
+        Task<CategoryDTO> GetById(int Id);
+        Task<IEnumerable<CategoryDTO>> GetAll();
     }
 }
