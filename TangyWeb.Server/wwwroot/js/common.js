@@ -10,4 +10,12 @@ window.ShowSwal = (type, message) => {
         Swal.fire("Success Notification!", message, "success");
     if (type === "error")
         Swal.fire("Error Notification!!!", message, "error");
-}
+};
+
+showDeleteConfirmationModal = () => {
+    $('#confirm_modal').modal('show');
+};
+
+hideDeleteConfirmationModal = () => {
+    $('#confirm_modal').modal('hide');
+};
