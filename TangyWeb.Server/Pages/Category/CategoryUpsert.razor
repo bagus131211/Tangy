@@ -49,29 +49,29 @@
             else
             {
                 Title = "Edit";
-                LoadCategory();
+                await LoadCategory();
             }
         }
     }
 
-    void LoadCategory()
+    async Task LoadCategory()
     {
         isLoading = true;
         StateHasChanged();
-        category = _categoryRepository.GetById(Id);
+        category = await _categoryRepository.GetById(Id);
         isLoading = false;
         StateHasChanged();
     }
 
-    void UpsertCategory()
+    async Task UpsertCategory()
     {
         if (category.Id == 0)
         {
-            _categoryRepository.Create(category);   
+            await _categoryRepository.Create(category);   
         }
         else
         {
-            _categoryRepository.Update(category);
+            await _categoryRepository.Update(category);
         }
         _navigation.NavigateTo("category");
     }
