@@ -8,6 +8,8 @@ using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Njg2NzU5QDMyMzAyZTMyMmUzMFZCelk1d0tiR1lYTFI2RTYxK3pqck1TTXpDY0gxWVdrWkRpR1M0dmVrNGs9");
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -16,6 +18,7 @@ builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(builder.Configur
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IFileUpload, FileUpload>();
+builder.Services.AddScoped<IProductPriceRepository, ProductPriceRepository>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSyncfusionBlazor();
 

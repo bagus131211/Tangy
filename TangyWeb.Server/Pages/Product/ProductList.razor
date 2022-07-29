@@ -35,8 +35,9 @@
                             <td>@item.Category.Name</td>
                             <td>
                                 <NavLink href=@($"/product/edit/{item.Id}") class="btn btn-primary">Edit</NavLink>
+                                <NavLink href=@($"/product/price/{item.Id}") class="btn btn-success">Price</NavLink>
                                 <button class="btn btn-danger" @onclick="()=>HandleDelete(item.Id)">Delete</button>
-                                </td>
+                            </td>
 
                         </tr>
                     }
@@ -73,7 +74,7 @@
         {
             await LoadProducts();
         }
-    } 
+    }
 
     async Task LoadProducts()
     {
@@ -96,7 +97,7 @@
         if (isConfirmed && deletedId is not 0)
         {
             ProductDTO product = await _productRepository.GetById(deletedId);
-            if(!product.ImageUri.Contains("default-image.jpg"))
+            if (!product.ImageUri.Contains("default-image.jpg"))
             {
                 await _uploadService.DeleteFile(product.ImageUri);
             }
