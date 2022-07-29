@@ -1,7 +1,7 @@
-﻿using Tangy.Models;
-
-namespace Tangy.Business.Respositories.Interface
+﻿namespace Tangy.Business.Respositories.Interface
 {
+    using Models;
+
     public interface ICategoryRepository
     {
         Task<CategoryDTO> Create(CategoryDTO category);
