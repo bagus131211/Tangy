@@ -28,7 +28,7 @@
     [Parameter]
     public RenderFragment RenderFragment2 { get; set; }
 
-    async Task FavouriteUpdated(ChangeEventArgs e) => await OnFavouriteUpdated.InvokeAsync((bool)e.Value);
+    async Task FavouriteUpdated(Microsoft.AspNetCore.Components.ChangeEventArgs e) => await OnFavouriteUpdated.InvokeAsync((bool)e.Value);
 
     async Task SelectedProductNameUpdated(MouseEventArgs e, string name) => await OnSelectedProductNameUpdated.InvokeAsync(name);
 }

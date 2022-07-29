@@ -1,0 +1,163 @@
+﻿@page "/product/create"
+@page "/product/edit/{id:int}"
+
+@inject ICategoryRepository _categoryRepository
+@inject IProductRepository _productRepository
+@inject IFileUpload _uploadService
+@inject IJSRuntime _jsRuntime
+@inject NavigationManager _navigation
+
+<div class="row my-2">
+    <h3 class="card-title text-primary mb-3 ms-lg-3">@Title Product</h3>
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <img src="/images/gear.gif" />
+        </div>
+    }
+    else
+    {
+        <div class="col-md-10">
+            <EditForm Model=@product OnValidSubmit=@UpsertProduct>
+                <DataAnnotationsValidator />
+                @*to summaries error message on the above (As paragraph)
+                    <ValidationSummary />*@
+                <div class="form-group">
+                    <label>Name</label>
+                    <InputText @bind-Value=@product.Name class="form-control"></InputText>
+                    <ValidationMessage For="()=>product.Name"></ValidationMessage>
+                </div>
+                <div class="form-group">
+                    <label>Colour</label>
+                    <InputText @bind-Value=@product.Colour class="form-control"></InputText>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <SfRichTextEditor @bind-Value=@product.Description class="form-control"></SfRichTextEditor>
+                    <ValidationMessage For="()=>product.Description"></ValidationMessage>
+                </div>
+                <div class="row pt-3">
+                    <div class="form-group col-6">
+                        <div class="form-check">
+                            <InputCheckbox @bind-Value=@product.ShopFavourites class="form-check-input"></InputCheckbox>
+                            <label class="form-check-label">Is Shop Favourite</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-6">
+                        <div class="form-check">
+                            <InputCheckbox @bind-Value=@product.CustomerFavourites class="form-check-input"></InputCheckbox>
+                            <label class="form-check-label">Is Customer Favourite</label>
+                        </div>
+                    </div>
+                    <div class="form-group col-6">
+                        <label>Category</label>
+                        <InputSelect @bind-Value=@product.CategoryId class="form-select">
+                            <option value="0" disabled="disabled" selected>---Select category---</option>
+                            @foreach (var category in categories)
+                            {
+                            <option value=@category.Id>@category.Name</option>
+                            }
+                    </InputSelect>
+                    <ValidationMessage For="()=>product.CategoryId"></ValidationMessage>
+                </div>
+                <div class="form-group pt-4 col-6">
+                    <InputFile OnChange=@HandleImageUpload></InputFile>
+                </div>
+            </div>
+            <div class="form-group py-4">
+                <button class="btn btn-primary">@Title</button>
+                <NavLink href="product" class="btn btn-secondary">Back to index</NavLink>
+            </div>
+        </EditForm>
+    </div>
+        <div class="col-md-2">
+            <img src=@product.ImageUri class="w-100" />
+        </div>
+    }
+</div>
+@code {
+    ProductDTO product = new()
+        {
+            ImageUri = "/images/default-image.jpg"
+        };
+    IEnumerable<CategoryDTO> categories = new List<CategoryDTO>();
+    string Title = "Create";
+    bool isLoading;
+    string oldImageUri;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadProduct();
+        }
+    }
+
+    async Task LoadProduct()
+    {
+        isLoading = true;
+        StateHasChanged();
+        categories = await _categoryRepository.GetAll();
+        if (Id is > 0)
+        {
+            Title = "Edit";
+            product = await _productRepository.GetById(Id);
+            oldImageUri = product.ImageUri;
+        }
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    async Task UpsertProduct()
+    {
+        if (product.Id == 0)
+        {
+            await _productRepository.Create(product);
+            await _jsRuntime.ToastrSuccess("Product created successfully");
+        }
+        else
+        {
+            if (product.ImageUri != oldImageUri)
+            {
+                await _uploadService.DeleteFile(oldImageUri);
+            }
+            await _productRepository.Update(product);
+            await _jsRuntime.ToastrSuccess("Product updated successfully");
+        }
+        _navigation.NavigateTo("product");
+    }
+
+    async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        try
+        {
+            if (e.GetMultipleFiles().Count > 0)
+            {
+                foreach (var file in e.GetMultipleFiles())
+                {
+                    var fileInfo = new FileInfo(file.Name);
+                    if (fileInfo.Extension.ToLower() == ".jpg" ||
+                        fileInfo.Extension.ToLower() == ".png" ||
+                        fileInfo.Extension.ToLower() == ".jpeg")
+                    {
+                        product.ImageUri = await _uploadService.UploadFile(file);
+                    }
+                    else
+                    {
+                        await _jsRuntime.ToastrFailure("Please select .jpg, .jpeg and .png only");
+                        return;
+                    }
+                }
+            }
+            isLoading = false;
+        }
+        catch (Exception ex)
+        {
+            await _jsRuntime.ToastrFailure(ex.Message);
+        }
+    }
+}

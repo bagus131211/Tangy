@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Tangy.Business.Respositories.Interface;
-using Tangy.Data;
-using Tangy.Data.Models;
-using Tangy.Models;
 
 namespace Tangy.Business.Respositories
 {
+    using Interface;
+    using Data;
+    using Data.Models;
+    using Models;
+
     public class CategoryRepository : ICategoryRepository
     {
         readonly AppDbContext _context;
@@ -44,9 +45,9 @@ namespace Tangy.Business.Respositories
             return _mapper.Map<IEnumerable<Category>, IEnumerable<CategoryDTO>>(_context.Categories);
         }
 
-        public async Task<CategoryDTO> GetById(int Id)
+        public async Task<CategoryDTO> GetById(int id)
         {
-            var category = await _context.Categories.FirstOrDefaultAsync(f => f.Id == Id);
+            var category = await _context.Categories.FirstOrDefaultAsync(f => f.Id == id);
             if (category is not null)
             {
                 return _mapper.Map<Category, CategoryDTO>(category);
@@ -61,7 +62,7 @@ namespace Tangy.Business.Respositories
             {
                 data.Name = category.Name;
                 _context.Categories.Update(data);
-                _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 return _mapper.Map<CategoryDTO>(data);
             }
             return category;

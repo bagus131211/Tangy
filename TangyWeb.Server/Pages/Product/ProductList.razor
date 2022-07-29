@@ -1,33 +1,40 @@
-﻿@page "/category"
+﻿@page "/product"
 
-@inject ICategoryRepository _categoryRepository
+@inject IProductRepository _productRepository
 @inject IJSRuntime _jsRuntime
+@inject IFileUpload _uploadService
 
 <_DeleteConfirmation IsParentLoading=@isLoading OnDeleteConfirmed=@DeleteConfirmed></_DeleteConfirmation>
 <div class="row mt-4">
     <div class="col-6">
-        <h4 class="card-title text-primary">Categories</h4>
+        <h4 class="card-title text-primary">Products</h4>
     </div>
     <div class="col-4 offset-2">
-        <a href="category/create" class="btn btn-primary form-control">Add new category</a>
+        <a href="product/create" class="btn btn-primary form-control">Add new product</a>
     </div>
     <div class="col-12 py-4">
-        @if (categories.Any())
+        @if (products.Any())
         {
             <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Shop Favourites</th>
+                        <th>Customer Favourites</th>
+                        <th>Category</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in categories)
+                    @foreach (var item in products)
                     {
                         <tr>
                             <td>@item.Name</td>
+                            <td><input type="checkbox" disabled @bind=@item.ShopFavourites /></td>
+                            <td><input type="checkbox" disabled @bind=@item.CustomerFavourites /></td>
+                            <td>@item.Category.Name</td>
                             <td>
-                                <NavLink href=@($"/category/edit/{item.Id}") class="btn btn-primary">Edit</NavLink>
+                                <NavLink href=@($"/product/edit/{item.Id}") class="btn btn-primary">Edit</NavLink>
                                 <button class="btn btn-danger" @onclick="()=>HandleDelete(item.Id)">Delete</button>
                                 </td>
 
@@ -53,7 +60,7 @@
 </div>
 
 @code {
-    IEnumerable<CategoryDTO> categories = new List<CategoryDTO>();
+    IEnumerable<ProductDTO> products = new List<ProductDTO>();
     bool isLoading;
     int deletedId = 0;
 
@@ -64,15 +71,15 @@
     {
         if (firstRender)
         {
-            await LoadCategories();
+            await LoadProducts();
         }
     } 
 
-    async Task LoadCategories()
+    async Task LoadProducts()
     {
         isLoading = true;
         StateHasChanged();
-        categories = await _categoryRepository.GetAll();
+        products = await _productRepository.GetAll();
         isLoading = false;
         StateHasChanged();
     }
@@ -88,8 +95,14 @@
         isLoading = true;
         if (isConfirmed && deletedId is not 0)
         {
-            await _categoryRepository.Delete(deletedId);
-            await LoadCategories();
+            ProductDTO product = await _productRepository.GetById(deletedId);
+            if(!product.ImageUri.Contains("default-image.jpg"))
+            {
+                await _uploadService.DeleteFile(product.ImageUri);
+            }
+            await _productRepository.Delete(deletedId);
+            await _jsRuntime.ToastrSuccess("Product deleted successfully");
+            await LoadProducts();
             await _jsRuntime.InvokeVoidAsync("hideDeleteConfirmationModal");
         }
         isLoading = false;
