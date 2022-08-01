@@ -1,0 +1,143 @@
+﻿@page "/cart"
+@using System.Globalization
+
+@inject ILocalStorageService _storageService
+@inject IProductService _productService
+@inject ICartService _cartService
+
+@if (isProcessing)
+{
+    <div style="position:fixed;top:50%;left:50%;margin-top:-50px;margin-left:-100px;">
+        <img src="/images/search.gif" />
+    </div>
+}
+else
+{
+    @if (!carts.Any())
+    {
+        <div>Please add items to cart.</div>
+    }
+    else
+    {
+        <div class="container mt-4">
+            <div class="card">
+                <div class="card-header bg-dark text-light ml-0 ">
+                    <div class="row">
+                        <div class="col-6  pt-2">
+                            Shopping Cart
+                        </div>
+                        <div class="col-6 col-md-3 offset-md-3 text-end">
+                            <a href="/" class="btn btn-outline-info form-control">Continue Shopping</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @foreach (var cart in carts)
+                    {
+                        <div class="row">
+                            <div class="col-3 col-md-1 text-center py-2">
+                                <img src=@cart.Product.ImageUri class="rounded" width="100%" />
+                            </div>
+                            <div class="col-9 text-sm-center text-md-start col-md-4 pt-lg-1 ">
+                                <h4><strong>@cart.Product.Name</strong></h4>
+
+                                <div class="badge bg-primary text-center" style="font-size:12px;">
+                                    @cart.Product.Category.Name
+                                </div>
+                                <div class="badge bg-info text-center" style="font-size:12px;">
+                                    @cart.Product.Colour
+                                </div>
+                                <div><p>Size : @cart.ProductPrice.Size</p></div>
+                            </div>
+                            <div class="col-12 text-sm-center col-md-7 text-md-start row  pt-lg-3 mt-3">
+                                <div class="col-4 pt-1 ">
+
+                                    <h6><strong>@(string.Format(CultureInfo.GetCultureInfo("id-ID"), "{0:C2}", cart.ProductPrice.Price)) <span class="text-muted">x</span> @cart.Count </strong></h6>
+                                </div>
+                                <div class="col-6 col-sm-4 col-lg-6">
+                                    <button @onclick=@(()=>Increment(cart)) type="submit" class="btn btn-primary">
+                                        <i class="bi bi-plus-square"></i>
+                                    </button>
+                                    <button @onclick=@(()=>Decrement(cart)) type="submit" class="btn btn-warning">
+                                        <i class="bi bi-dash-square"></i>
+                                    </button>
+                                </div>
+                                <div class="col-2 col-sm-4 col-lg-2 text-right">
+                                    <button @onclick=@(()=>Decrement(cart, 0)) type="submit" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-12 col-md-5">
+                        </div>
+                        <div class="col-12 col-md-6 offset-md-1 col-lg-4 offset-lg-3 pr-4">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between bg-light">
+                                    <span class="text-info"> Total (IDR)</span>
+                                    <strong class="text-info">@(string.Format(CultureInfo.GetCultureInfo("id-ID"), "{0:C2}", total))</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="card-footer">
+                    <div class="col-12  col-md-3 offset-md-9">
+                        <a href="" class="btn btn-secondary form-control">Summary</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    bool isProcessing = false;
+    ICollection<ShoppingCart> carts = new List<ShoppingCart>();
+    IEnumerable<ProductDTO> products;
+    double total = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isProcessing = true;
+        products = await _productService.GetAll();
+        await LoadCart();
+        isProcessing = false;
+    }
+
+    async Task LoadCart()
+    {
+        total = 0;
+        carts = await _storageService.GetItemAsync<List<ShoppingCart>>(Constants.ShoppingCart);
+        foreach (var cart in carts)
+        {
+            cart.Product = products.FirstOrDefault(f => f.Id == cart.ProductId);
+            cart.ProductPrice = cart.Product.ProductPrices.FirstOrDefault(f => f.Id == cart.ProductPriceId);
+            total += cart.ProductPrice.Price * cart.Count;
+        }
+    }
+
+    async Task Increment(ShoppingCart cart)
+    {
+        isProcessing = true;
+        cart.Count = 1;
+        await _cartService.IncrementCart(cart);
+        await LoadCart();
+        isProcessing = false;
+    }
+
+    async Task Decrement(ShoppingCart cart, int? forDelete = null)
+    {
+        isProcessing = true;
+        cart.Count =  forDelete.HasValue ? 0 : 1;
+        await _cartService.DecrementCart(cart);
+        await LoadCart();
+        isProcessing = false;
+    }
+}

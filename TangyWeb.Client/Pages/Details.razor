@@ -3,6 +3,9 @@
 @using TangyWeb.Client.ViewModel
 
 @inject IProductService _productService
+@inject ICartService _cartService
+@inject NavigationManager _navigation
+@inject IJSRuntime _jsRuntime
 
 @if (isProcessing)
 {
@@ -115,8 +118,18 @@ else
         details.SelectedPriceId = selectedPriceId;
     }
 
-    async void AddToCart()
+    async Task AddToCart()
     {
-        
+        ShoppingCart shoppingCart = new()
+            {
+                Count = details.Count,
+                ProductId = Id,
+                ProductPriceId = details.SelectedPriceId
+            };
+
+        await _cartService.IncrementCart(shoppingCart);
+        _navigation.NavigateTo("/");
+        await _jsRuntime.ToastrSuccess("Product added to cart successfully");
+
     }
 }
