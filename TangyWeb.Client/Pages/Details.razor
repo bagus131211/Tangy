@@ -1,0 +1,122 @@
+﻿@page "/details/{id:int}"
+@using System.Globalization
+@using TangyWeb.Client.ViewModel
+
+@inject IProductService _productService
+
+@if (isProcessing)
+{
+    <div style="position:fixed;top:50%;left:50%;margin-top:-50px;margin-left:-100px;">
+        <img src="/images/search.gif" />
+    </div>
+}
+else
+{
+    <EditForm OnValidSubmit=@AddToCart Model=@details method="post">
+        <DataAnnotationsValidator />
+        <div class="card container mt-4">
+            <div class="card-header ml-0  row">
+                <div class="col-12 col-md-6">
+                    <h1 class="text-primary">@product.Name</h1>
+                </div>
+
+                <div class="col-12 col-md-6 text-end pt-4">
+                    <span class="badge bg-info pt-2" style="height:30px;">@product.Category.Name</span>
+                    <span class="badge bg-warning pt-2" style="height:30px;">@product.Colour</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="container rounded p-2">
+                    <div class="row">
+                        <div class="col-10">
+                            <p>@((MarkupString)product.Description)</p>
+                            <div class="row">
+                                @foreach (var price in product.ProductPrices)
+                                {
+                                    if (price.Id == details.SelectedPriceId)
+                                    {
+                                        <div class="col-2 bg-light text-center pt-2 m-2"
+                                 style="border:3px solid #28A745; border-radius:10px;box-shadow:5px">
+                                            <p>@price.Size</p>
+                                            <p>@(string.Format(CultureInfo.GetCultureInfo("id-ID"), "{0:C2}", price.Price))</p>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-2 bg-light text-center pt-2 m-2"
+                                 style="border:1px solid; border-radius:10px;box-shadow:5px"
+                                 @onclick="(args)=>GetSelectedId(args, price.Id)">
+                                            <p>@price.Size</p>
+                                            <p>@(string.Format(CultureInfo.GetCultureInfo("id-ID"), "{0:C2}", price.Price))</p>
+                                        </div>
+                                    }
+                                }
+                                @if (!product.ProductPrices.Any())
+                                {
+                                    <p class="text-warning">No size available...</p>
+                                }
+                                else
+                                {
+                                    <div class="row pl-2">
+                                        <div class="col-2 text-primary"><h4>Count</h4></div>
+                                        <div class="col-10">
+                                            <InputNumber @bind-Value=@details.Count class="form-control" />
+                                            <ValidationMessage For="()=>details.Count"></ValidationMessage>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <img src="@product.ImageUri" width="100%" class="rounded" />
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-12 col-md-6 pb-1">
+                            <a class="btn btn-success form-control " href="/">Back to Home</a>
+                        </div>
+                        <div class="col-12 col-md-6 pb-1">
+                            @if (details.SelectedPriceId > 0)
+                            {
+                                <button type="submit" value="Add to Cart" class="btn btn-primary form-control">Add to Cart</button>
+                            }
+                            else
+                            {
+                                <button type="submit" disabled value="Add to Cart" class="btn btn-primary form-control">Add to Cart</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    ProductDTO product = new();
+    bool isProcessing = false;
+    DetailsVM details = new();
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        isProcessing = true;
+        product = await _productService.GetById(Id);
+        isProcessing = false;
+    }
+
+    async Task GetSelectedId(MouseEventArgs args, int selectedPriceId)
+    {
+        details.ProductPrice = product?.ProductPrices?.FirstOrDefault(f => f.Id == selectedPriceId);
+        details.SelectedPriceId = selectedPriceId;
+    }
+
+    async void AddToCart()
+    {
+        
+    }
+}
