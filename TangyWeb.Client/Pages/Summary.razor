@@ -1,0 +1,145 @@
+﻿@page "/summary"
+
+@inject ILocalStorageService _storageService
+@inject IProductService _productService
+@inject IJSRuntime _jsRuntime
+
+@if (isProcessing)
+{
+    <div style="position:fixed;top:50%;left:50%;margin-top:-50px;margin-left:-100px;">
+        <img src="/images/search.gif" />
+    </div>
+}
+else
+{
+    <div class="mt-4 mx-4 px-md-5 mx-md-5 p-1">
+        <div class="row p-2 my-3">
+            <div class="col-12 col-lg-7 p-4">
+                <div class="row px-2 text-success ">
+                    <div class="col-8 py-1"><p style="font-size:x-large;margin:0px;">Order Summary</p></div>
+                    <div class="col-4 p-0" style="text-align:right">
+                        <a href="/cart" class="btn btn-secondary btn-block">Back to cart</a>
+                    </div>
+                </div>
+                @foreach(var detail in order.OrderDetails)
+                {
+                <div class="row border p-1 m-1">
+
+                    <div class="col-3 col-md-2 ">
+                        <img src=@detail.Product.ImageUri width="100%">
+                    </div>
+                    <div class="col-5 col-md-5 ">
+                        <span class="">Product : @detail.ProductName </span><br />
+                        <span class="pt-1">Size : @detail.Size</span><br />
+                        <span class="pt-1">Count : @detail.Count</span><br />
+
+                    </div>
+                    <div class="col-4 col-md-5 " style="text-align:right;">
+                        <h4 class="text-warning font-weight-bold pt-2">
+                            IDR
+                            <span style="border-bottom:1px solid #ff6a00">
+                                @(detail.Price * detail.Count)
+                            </span>
+                        </h4>
+                    </div>
+                </div>
+                }
+                <div class="row" style="text-align:right">
+                    <div class="col-12 px-3">
+                        <h3> Order Total : <span class="text-secondary">IDR @order.OrderHeader.Total</span> </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-5 p-4 ml-4 ml-md-0 mt-4 mt-md-0 border">
+                <EditForm Model=@order.OrderHeader OnValidSubmit=@HandleCheckout method="post">
+                    <DataAnnotationsValidator />
+                    <div class="row px-2 text-success border-bottom"><div class="col-7 py-1"><p style="font-size:x-large;margin:0px;">Enter Details</p></div></div>
+
+                    <div class="form-group pt-2">
+                        <label class="text-warning">Name</label>
+                        <InputText @bind-Value=@order.OrderHeader.Name class="form-control" />
+                        <ValidationMessage For="()=>order.OrderHeader.Name"></ValidationMessage>
+                    </div>
+                    <div class="form-group pt-2">
+                        <label class="text-warning">Phone</label>
+                        <InputText @bind-Value=@order.OrderHeader.PhoneNumber class="form-control" />
+                        <ValidationMessage For="()=>order.OrderHeader.PhoneNumber"></ValidationMessage>
+                    </div>
+                    <div class="form-group pt-2">
+                        <label class="text-warning">Email</label>
+                        <InputText @bind-Value=@order.OrderHeader.Email class="form-control" />
+                        <ValidationMessage For="()=>order.OrderHeader.Email"></ValidationMessage>
+                    </div>
+                    <div class="form-group pt-2">
+                        <label class="text-warning">Street Address</label>
+                        <InputText @bind-Value=@order.OrderHeader.StreetAddress class="form-control" />
+                        <ValidationMessage For="()=>order.OrderHeader.StreetAddress"></ValidationMessage>
+                    </div>
+                    <div class="form-group pt-2">
+                        <label class="text-warning">City</label>
+                        <InputText @bind-Value=@order.OrderHeader.City class="form-control" />
+                        <ValidationMessage For="()=>order.OrderHeader.City"></ValidationMessage>
+                    </div>
+                    <div class="form-group pt-2">
+                        <label class="text-warning">State</label>
+                        <InputText @bind-Value=@order.OrderHeader.State class="form-control" />
+                        <ValidationMessage For="()=>order.OrderHeader.State"></ValidationMessage>
+                    </div>
+                    <div class="form-group pt-2">
+                        <label class="text-warning">Postal Code</label>
+                        <InputText @bind-Value=@order.OrderHeader.PostalCode class="form-control" />
+                        <ValidationMessage For="()=>order.OrderHeader.PostalCode"></ValidationMessage>
+                    </div>
+                    <div class="form-group pt-2">
+                        <button type="submit" class="btn btn-success form-control">Checkout Now</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+@code {
+    OrderDTO? order = null;
+    bool isProcessing = false;
+    IEnumerable<ProductDTO> products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isProcessing = true;
+        var carts = await _storageService.GetItemAsync<List<ShoppingCart>>(Constants.ShoppingCart);
+        products = await _productService.GetAll();
+        order = new()
+            {
+                OrderHeader = new()
+                {
+                    Total = 0,
+                    Status = Constants.Status.Pending
+                },
+                OrderDetails = new List<OrderDetailDTO>()
+            };
+
+        foreach (var cart in carts)
+        {
+            var product = products.FirstOrDefault(f => f.Id == cart.ProductId);
+            var price = product.ProductPrices.FirstOrDefault(f => f.Id == cart.ProductPriceId);
+
+            var orderDetail = new OrderDetailDTO()
+                {
+                    ProductId = cart.ProductId,
+                    Size = price.Size,
+                    Count = cart.Count,
+                    Price = price.Price,
+                    ProductName = product.Name,
+                    Product = product,
+                };
+            order.OrderDetails.Add(orderDetail);
+            order.OrderHeader.Total += cart.Count * price.Price;
+        }
+        isProcessing = false;
+    }
+
+    async Task HandleCheckout()
+    {
+        
+    }
+}

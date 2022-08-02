@@ -23,4 +23,5 @@ builder.Services.AddBlazoredLocalStorage(config =>
     config.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
     config.JsonSerializerOptions.WriteIndented = false;
 }); 
+builder.Services.AddScoped<IOrderService, OrderService>();
 await builder.Build().RunAsync();
