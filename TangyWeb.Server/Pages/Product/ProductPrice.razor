@@ -5,6 +5,8 @@
 @inject IProductPriceRepository _priceRepository
 @inject IProductRepository _productRepository
 
+@attribute [Authorize]
+
 <h3 class="card-title text-primary mb-3 ml-3">Product Price Management</h3>
 @if (isLoading)
 {

@@ -7,6 +7,8 @@
 @inject IJSRuntime _jsRuntime
 @inject NavigationManager _navigation
 
+@attribute [Authorize]
+
 <div class="row my-2">
     <h3 class="card-title text-primary mb-3 ms-lg-3">@Title Product</h3>
     @if (isLoading)
