@@ -3,6 +3,9 @@
 @inject IProductRepository _productRepository
 @inject IJSRuntime _jsRuntime
 @inject IFileUpload _uploadService
+@inject NavigationManager _navigation
+
+@*@attribute [Authorize]*@
 
 <_DeleteConfirmation IsParentLoading=@isLoading OnDeleteConfirmed=@DeleteConfirmed></_DeleteConfirmation>
 <div class="row mt-4">
@@ -65,8 +68,25 @@
     bool isLoading;
     int deletedId = 0;
 
-    //protected override void OnInitialized()
-    //    => categories = _categoryRepository.GetAll();
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    protected override async void OnInitialized()
+    {
+        var authState = await AuthState;
+        if (!authState.User.Identity.IsAuthenticated)
+        {
+            var currentUri = new Uri(_navigation.Uri);
+            _navigation.NavigateTo($"/identity/account/login?returnUrl={currentUri.LocalPath}", true);
+        }
+        else
+        {
+            if(!authState.User.IsInRole(Constants.Role.Admin))
+            {
+                _navigation.NavigateTo("/someErrorPage");
+            }
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

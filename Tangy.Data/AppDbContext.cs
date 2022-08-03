@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Tangy.Data
 {
     using Models;
 
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> opts) : base(opts)
         {
@@ -16,5 +17,6 @@ namespace Tangy.Data
         public DbSet<ProductPrice> ProductPrices { get; set; }
         public DbSet<OrderHeader> OrderHeaders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<AppUser> AppUsers { get; set; }
     }
 }

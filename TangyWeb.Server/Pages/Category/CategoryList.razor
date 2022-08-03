@@ -3,6 +3,8 @@
 @inject ICategoryRepository _categoryRepository
 @inject IJSRuntime _jsRuntime
 
+@attribute [Authorize(Roles = Constants.Role.Admin)]
+
 <_DeleteConfirmation IsParentLoading=@isLoading OnDeleteConfirmed=@DeleteConfirmed></_DeleteConfirmation>
 <div class="row mt-4">
     <div class="col-6">
