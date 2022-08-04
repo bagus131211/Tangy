@@ -1,0 +1,61 @@
+﻿@page "/orderConfirmation"
+
+@inject ILocalStorageService _localStorage
+@inject IOrderService _orderService
+
+<div class="container">
+    @if (isProcessing)
+    {
+        <div style="position:fixed;top:50%;left:50%;margin-top:-50px;margin-left:-100px;">
+            <img src="/images/search.gif" />
+        </div>
+    }
+    else
+    {
+        @if (order.OrderHeader.Status == Constants.Status.Confirmed)
+        {
+            <div class="row mt-4 pt-4">
+                <div class="col-10 offset-1 text-center">
+                <h2 class="text-warning">Order Confirmed</h2>
+                <p>Your order has been placed successfully with order id : <span class="fst-italic fw-bold">@order.OrderHeader.Id</span></p>
+            </div>
+            <div class="col-8 offset-2">
+                <img src="/images/confirmation.jpg" class="w-100" style="border-radius:30px" />
+            </div>
+            </div>
+        }
+        else
+        {
+            <div class="row mt-4 pt-4">
+                <div class="col-10 offset-1 text-center">
+                <h2 class="text-warning">Order Issue!</h2>
+                <p>Your order had order issue please contact us, with order id : <span class="fst-italic fw-bold">@order.OrderHeader.Id</span></p>
+            </div>
+            <div class="col-8 offset-2">
+                <img src="/images/confirmation.jpg" class="w-100" style="border-radius:30px" />
+            </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    bool isProcessing = default;
+    OrderDTO order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isProcessing = true;
+        order = await _localStorage.GetItemAsync<OrderDTO>(Constants.Transaction.OrderDetails);
+
+        var updateStatus = await _orderService.MarkPaymentSuccessful(order.OrderHeader);
+
+        if (updateStatus.Status is Constants.Status.Confirmed)
+        {
+            await _localStorage.RemoveItemAsync(Constants.Transaction.OrderDetails);
+            await _localStorage.RemoveItemAsync(Constants.ShoppingCart);
+        }
+
+        isProcessing = false;
+    }
+}

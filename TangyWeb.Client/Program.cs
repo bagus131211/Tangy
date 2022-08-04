@@ -28,4 +28,5 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthenticationStateProviderExtension>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 await builder.Build().RunAsync();

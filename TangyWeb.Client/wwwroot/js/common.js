@@ -19,3 +19,8 @@ showDeleteConfirmationModal = () => {
 hideDeleteConfirmationModal = () => {
     $('#confirm_modal').modal('hide');
 };
+
+redirectToCheckout = (sessionId) => {
+    var stripe = Stripe("pk_test_51LT1r9CdXMeNGCgoLsfyRkU2IX26GGwwh96RF5fNt0PUZlxKT4aPMxVt4ywvQqSZFuX1k4n3JMRX5M06jLZQNurC008jDg8GXn");
+    stripe.redirectToCheckout({ sessionId: sessionId });
+}

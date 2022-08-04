@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Stripe.Checkout;
 using Tangy.Business.Respositories.Interface;
 using Tangy.Models;
 
@@ -43,6 +44,33 @@ namespace TangyWeb.API.Controllers
                 });
             }
             return Ok(order);
+        }
+
+        [HttpPost]
+        [ActionName("create")]
+        public async Task<IActionResult> Create([FromBody] StripePaymentDTO payment)
+        {
+            payment.Order.OrderHeader.OrderDate = DateTime.Now;
+            var result = await _orderRepository.Create(payment.Order);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [ActionName("markpayment")]
+        public async Task<IActionResult> MarkMyPayment([FromBody] OrderHeaderDTO orderHeader)
+        {
+            var service = new SessionService();
+            var sessionDetails = service.Get(orderHeader.SessionId);
+            if (sessionDetails.PaymentStatus is "paid")
+            {
+                var result = await _orderRepository.MarkPaymentAsSuccessful(orderHeader.Id);
+                if (result is null)
+                {
+                    return BadRequest(new ErrorDTO { ErrorMessage = "Can not mark payment as successful" });
+                }
+                return Ok(result);
+            }
+            return BadRequest();
         }
     }
 }

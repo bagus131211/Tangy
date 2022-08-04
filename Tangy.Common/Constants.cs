@@ -24,5 +24,10 @@
             public const string Token = "JWT Token";
             public const string UserDetails = "UserDetails";
         }
+
+        public static class Transaction
+        {
+            public const string OrderDetails = "OrderDetails";
+        }
     }
 }
