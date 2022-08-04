@@ -1,0 +1,38 @@
+﻿@page "/login"
+
+<EditForm Model=@_signInRequest OnValidSubmit=@UserLogin>
+    <DataAnnotationsValidator />
+    <div class="py-4">
+        <div class=" row form-group ">
+            <div class="col-6 offset-3 ">
+                <div class="card border">
+                    <div class="card-body px-lg-5 pt-4">
+                        <h3 class="col-12 text-success text-center py-2">
+                            <strong>Sign In</strong>
+                        </h3>
+                        @if (_showLoginError)
+                        {
+                            <p class="text-danger text-center">@_error</p>
+                        }
+                        <div class="py-2">
+                            <InputText @bind-Value=@_signInRequest.UserName id="email" placeholder="Email..." class="form-control mb-2" />
+                            <ValidationMessage For=@(()=>_signInRequest.UserName)></ValidationMessage>
+                        </div>
+                        <div class="py-2">
+                            <InputText @bind-Value=@_signInRequest.Password type="password" placeholder="Password..." id="password" class="form-control mb-2" />
+                            <ValidationMessage For=@(()=>_signInRequest.Password)></ValidationMessage>
+                        </div>
+                        <div class="py-2">
+                            <button type="submit" class="btn btn-success btn-block"><i class="bi bi-person-bounding-box"></i> Sign in</button>
+                            <a href="/register" class="btn btn-primary text-white m-2"><i class="bi bi-person-plus-fill"></i> Register as a new user</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+}

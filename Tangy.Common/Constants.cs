@@ -18,5 +18,11 @@
             public const string Admin = "Admin";
             public const string Customer = "Customer";
         }
+
+        public static class Authentication
+        {
+            public const string Token = "JWT Token";
+            public const string UserDetails = "UserDetails";
+        }
     }
 }

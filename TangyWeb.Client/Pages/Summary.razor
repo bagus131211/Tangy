@@ -4,6 +4,8 @@
 @inject IProductService _productService
 @inject IJSRuntime _jsRuntime
 
+@attribute [Authorize]
+
 @if (isProcessing)
 {
     <div style="position:fixed;top:50%;left:50%;margin-top:-50px;margin-left:-100px;">
@@ -134,6 +136,16 @@ else
                 };
             order.OrderDetails.Add(orderDetail);
             order.OrderHeader.Total += cart.Count * price.Price;
+        }
+
+        if (await _storageService.GetItemAsync<UserDTO>(Constants.Authentication.UserDetails) is not null)
+        {
+            var userInfo = await _storageService.GetItemAsync<UserDTO>(Constants.Authentication.UserDetails);
+            order.OrderHeader.UserId = userInfo.Id;
+            order.OrderHeader.Name = userInfo.Name;
+            order.OrderHeader.Email = userInfo.Email;
+            order.OrderHeader.PhoneNumber = userInfo.PhoneNumber;
+
         }
         isProcessing = false;
     }
