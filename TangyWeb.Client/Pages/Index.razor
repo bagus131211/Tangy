@@ -2,6 +2,15 @@
 @using System.Globalization
 @inject IProductService _productService
 
+<AuthorizeView>
+    <Authorized>
+        <p>Welcome, @context.User.Identity.Name</p>
+    </Authorized>
+    <NotAuthorized>
+        <p>Not Login!</p>
+    </NotAuthorized>
+</AuthorizeView>
+
 @if (isProcessing)
 {
     <div style="position:fixed;top:50%;left:50%;margin-top:-50px;margin-left:-100px;">
