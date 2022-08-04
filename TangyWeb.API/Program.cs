@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Stripe;
 using System.Text;
 using Tangy.Business.Respositories;
 using Tangy.Business.Respositories.Interface;
@@ -73,12 +74,16 @@ builder.Services.AddAuthentication(opt =>
 builder.Services.Configure<LoginSetting>(loginSettingSection);
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddCors(c => c.AddPolicy("Tangy", b =>
 {
     b.AllowAnyOrigin()
      .AllowAnyMethod()
      .AllowAnyHeader();
 }));
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe")["secret"];
+
+
 
 var app = builder.Build();
 

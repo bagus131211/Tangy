@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Text;
 using Tangy.Models;
 
 namespace TangyWeb.Client.Service
@@ -15,6 +16,22 @@ namespace TangyWeb.Client.Service
             _configuration = configuration;
             _baseServerUri = _configuration.GetSection("BaseServerUri").Value;
         }
+
+        public async Task<OrderDTO> Create(StripePaymentDTO payment)
+        {
+            var content = JsonConvert.SerializeObject(payment);
+            var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync("api/order/create", bodyContent);
+            var tempContent = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                var result = JsonConvert.DeserializeObject<OrderDTO>(tempContent);
+                return result;
+            }
+            return new OrderDTO();
+
+        }
+
         public async Task<ICollection<OrderDTO>> GetAll(string? userId)
         {
             var response = await _httpClient.GetAsync("/api/order");
@@ -41,6 +58,21 @@ namespace TangyWeb.Client.Service
                 var error = JsonConvert.DeserializeObject<ErrorDTO>(content);
                 throw new Exception(error.ErrorMessage);
             }
+        }
+
+        public async Task<OrderHeaderDTO> MarkPaymentSuccessful(OrderHeaderDTO orderHeader)
+        {
+            var content = JsonConvert.SerializeObject(orderHeader);
+            var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync("api/order/markpayment", bodyContent);
+            var tempContent = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                var result = JsonConvert.DeserializeObject<OrderHeaderDTO>(tempContent);
+                return result;
+            }
+            var error = JsonConvert.DeserializeObject<ErrorDTO>(tempContent);
+            throw new Exception(error.ErrorMessage);
         }
     }
 }

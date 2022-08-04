@@ -16,5 +16,8 @@ namespace TangyWeb.Client.Helper
         public static async ValueTask SwalFailure(this IJSRuntime jsRuntime, string message)
             => await jsRuntime.InvokeVoidAsync("ShowSwal", "error", message);
 
+        public static async ValueTask StripeRedirect(this IJSRuntime jsRuntime, string sessionId)
+            => await jsRuntime.InvokeVoidAsync("redirectToCheckout", sessionId);
+
     }
 }

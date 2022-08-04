@@ -2,6 +2,8 @@
 
 @inject ILocalStorageService _storageService
 @inject IProductService _productService
+@inject IPaymentService _paymentService
+@inject IOrderService _orderService
 @inject IJSRuntime _jsRuntime
 
 @attribute [Authorize]
@@ -152,6 +154,19 @@ else
 
     async Task HandleCheckout()
     {
-        
+        try
+        {
+            var payment = new StripePaymentDTO { Order = order };
+            var checkout = await _paymentService.Checkout(payment);
+            order.OrderHeader.SessionId = checkout.Data.ToString();
+            var saved = await _orderService.Create(payment);
+            await _storageService.SetItemAsync(Constants.Transaction.OrderDetails, saved);
+            await _jsRuntime.StripeRedirect(checkout.Data.ToString());
+
+        }
+        catch(Exception ex)
+        {
+            await _jsRuntime.ToastrFailure(ex.Message);
+        }
     }
 }
