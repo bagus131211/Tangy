@@ -10,5 +10,6 @@
         Task<OrderHeaderDTO> UpdateOrderHeader(OrderHeaderDTO orderHeader);
         Task<OrderHeaderDTO> MarkPaymentAsSuccessful(int id);
         Task<bool> UpdateOrderStatus(int id, string status);
+        Task<OrderHeaderDTO> CancelOrder(int id);
     }
 }

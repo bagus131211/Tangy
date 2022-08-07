@@ -1,0 +1,75 @@
+﻿@page "/Orderlist"
+
+@inject IOrderRepository _orderRepository
+@inject NavigationManager _navigation
+
+@attribute [Authorize]
+
+<div>
+    <h4 class="card-title text-info">Order's List</h4>
+    @if (orderHeaders.Any())
+    {
+        <RadzenDataGrid AllowFiltering="true" AllowColumnResize="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                    Data=@orderHeaders TItem=@OrderHeaderDTO LogicalFilterOperator="LogicalFilterOperator.Or">
+            <Columns>
+                <RadzenDataGridColumn TItem=@OrderHeaderDTO Property="Id" Filterable="false" Title="ID" Width="50px"/>
+                
+                <RadzenDataGridColumn TItem=@OrderHeaderDTO Property="Name" Title="Name"  />
+                <RadzenDataGridColumn TItem=@OrderHeaderDTO Property="Email" Title="Email"  />
+                <RadzenDataGridColumn TItem=@OrderHeaderDTO Property="PhoneNumber" Title="Phone Number" />
+                <RadzenDataGridColumn TItem=@OrderHeaderDTO Property="Total" Title="Total (Order)"  FormatString="{0:c}" />
+                <RadzenDataGridColumn TItem=@OrderHeaderDTO Property="OrderDate" Title="Date of Order" FormatString="{0:d}"  />
+                <RadzenDataGridColumn TItem=@OrderHeaderDTO Property="Status" Title="Status" />
+                <RadzenDataGridColumn TItem=@OrderHeaderDTO Property="Details">
+                    <Template Context="data">
+                        <RadzenButton Click=@(()=>GetOrderDetails(data.Id)) Text="Details" ButtonStyle="ButtonStyle.Secondary"></RadzenButton>
+                    </Template>
+                </RadzenDataGridColumn>
+                @*<RadzenDataGridColumn TItem=@OrderHeaderDTO Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="60px">
+                    <Template Context="data">
+                        <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" />
+                    </Template>
+                </RadzenDataGridColumn>*@
+            </Columns>
+        </RadzenDataGrid>
+    }
+    else
+    {
+        if (isLoading)
+        {
+            <div class="text-center">
+                <img src="/images/gear.gif" />
+            </div>
+        }
+    }
+</div>
+
+@code {
+    IEnumerable<OrderHeaderDTO> orderHeaders = new List<OrderHeaderDTO>();
+    bool isLoading = default;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadOrders();
+        }
+    }
+
+    async Task LoadOrders()
+    {
+        isLoading = true;
+        StateHasChanged();
+
+        var orders = await _orderRepository.GetAll();
+        orderHeaders = orders.Select(s => s.OrderHeader);
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    void GetOrderDetails(int id)
+    {
+        _navigation.NavigateTo("/order/details/" + id);
+    }
+}

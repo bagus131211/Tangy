@@ -156,12 +156,19 @@ else
     {
         try
         {
+            isProcessing = true;
             var payment = new StripePaymentDTO { Order = order };
             var checkout = await _paymentService.Checkout(payment);
-            order.OrderHeader.SessionId = checkout.Data.ToString();
+
+            var stripeSessionAndPaymentIntent = checkout.Data.ToString().Split(';');
+
+            order.OrderHeader.SessionId = stripeSessionAndPaymentIntent[0];
+            order.OrderHeader.PaymentIntentId = stripeSessionAndPaymentIntent[1];
+
             var saved = await _orderService.Create(payment);
+
             await _storageService.SetItemAsync(Constants.Transaction.OrderDetails, saved);
-            await _jsRuntime.StripeRedirect(checkout.Data.ToString());
+            await _jsRuntime.StripeRedirect(stripeSessionAndPaymentIntent[0]);
 
         }
         catch(Exception ex)
