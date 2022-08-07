@@ -54,7 +54,7 @@ namespace TangyWeb.API.Controllers
 
                 var service = new SessionService();
                 var session = service.Create(options);
-                return Ok(new SuccessDTO { Data = session.Id });
+                return Ok(new SuccessDTO { Data = session.Id +';'+ session.PaymentIntentId });
             }
             catch (Exception ex)
             {

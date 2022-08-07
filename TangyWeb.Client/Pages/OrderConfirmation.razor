@@ -52,6 +52,7 @@
 
         if (updateStatus.Status is Constants.Status.Confirmed)
         {
+            order.OrderHeader.Status = updateStatus.Status;
             await _localStorage.RemoveItemAsync(Constants.Transaction.OrderDetails);
             await _localStorage.RemoveItemAsync(Constants.ShoppingCart);
         }

@@ -1,19 +1,15 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Tangy.Business.Respositories.Interface;
-using Tangy.Common;
-using Tangy.Data;
-using Tangy.Data.Models;
-using Tangy.Data.ViewModels;
-using Tangy.Models;
+using Stripe;
 
 namespace Tangy.Business.Respositories
 {
+    using Interface;
+    using Common;
+    using Data;
+    using Models;
+    using Data.ViewModels;
+
     public class OrderRepository : IOrderRepository
     {
         readonly AppDbContext _context;
@@ -23,6 +19,33 @@ namespace Tangy.Business.Respositories
         {
             _context = context;
             _mapper = mapper;
+        }
+
+        public async Task<OrderHeaderDTO> CancelOrder(int id)
+        {
+            var header = await _context.OrderHeaders.FindAsync(id);
+            if (header is null)
+                return new OrderHeaderDTO();
+            if (header.Status is Constants.Status.Pending)
+            {
+                header.Status = Constants.Status.Cancelled;
+                await _context.SaveChangesAsync();
+                return _mapper.Map<OrderHeaderDTO>(header);
+            }
+
+            var opt = new RefundCreateOptions
+            {
+                Reason = RefundReasons.RequestedByCustomer,
+                PaymentIntent = header.PaymentIntentId,
+            };
+
+            var service = new RefundService();
+            var refund = service.Create(opt);
+
+            header.Status = Constants.Status.Refunded;
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<OrderHeaderDTO>(header);
         }
 
         public async Task<OrderDTO> Create(OrderDTO order)
@@ -77,7 +100,7 @@ namespace Tangy.Business.Respositories
                 OrderDTO order = new OrderDTO
                 {
                     OrderHeader = _mapper.Map<OrderHeaderDTO>(header),
-                    OrderDetails = (ICollection<OrderDetailDTO>)_mapper.Map<OrderDetailDTO>(orderDetailList.Where(w => w.OrderHeaderId == header.Id))
+                    OrderDetails = _mapper.Map<ICollection<OrderDetailDTO>>(orderDetailList.Where(w => w.OrderHeaderId == header.Id))
                 };
                 orders.Add(order);
             }
@@ -118,8 +141,19 @@ namespace Tangy.Business.Respositories
         {
             if(orderHeader is not null)
             {
-                var header = _mapper.Map<OrderHeader>(orderHeader);
-                _context.OrderHeaders.Update(header);
+                var header = await _context.OrderHeaders.FirstOrDefaultAsync(f => f.Id == orderHeader.Id);
+                if (header is not null)
+                {
+                    header.Name = orderHeader.Name;
+                    header.PhoneNumber = orderHeader.PhoneNumber;
+                    header.Carrier = orderHeader.Carrier;
+                    header.Tracking = orderHeader.Tracking;
+                    header.City = orderHeader.City;
+                    header.StreetAddress = orderHeader.StreetAddress; ;
+                    header.State = orderHeader.State;
+                    header.PostalCode = orderHeader.PostalCode;
+                    header.Status = orderHeader.Status;
+                }
                 await _context.SaveChangesAsync();
                 return orderHeader;
             }
