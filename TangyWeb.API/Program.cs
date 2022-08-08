@@ -88,11 +88,20 @@ builder.Services.AddScoped<IEmailSender, EmailSender>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//local
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+
+//azure
+app.UseSwagger();
+app.UseSwaggerUI(u =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    u.SwaggerEndpoint("/swagger/v1/swagger.json", "Tangy Blazor API v1");
+    u.RoutePrefix = string.Empty;
+});
 
 app.UseHttpsRedirection();
 
