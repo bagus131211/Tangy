@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Stripe.Checkout;
 using Tangy.Business.Respositories.Interface;
@@ -11,10 +12,12 @@ namespace TangyWeb.API.Controllers
     public class OrderController : ControllerBase
     {
         readonly IOrderRepository _orderRepository;
+        readonly IEmailSender _mailer;
 
-        public OrderController(IOrderRepository orderRepository)
+        public OrderController(IOrderRepository orderRepository, IEmailSender mailer)
         {
             _orderRepository = orderRepository;
+            _mailer = mailer;
         }
 
         [HttpGet]
@@ -68,6 +71,7 @@ namespace TangyWeb.API.Controllers
                 {
                     return BadRequest(new ErrorDTO { ErrorMessage = "Can not mark payment as successful" });
                 }
+                await _mailer.SendEmailAsync(result.Email, "Tangy Order Confirmation", "New payment has been issued : " + result.Id);
                 return Ok(result);
             }
             return BadRequest();

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -82,8 +83,7 @@ builder.Services.AddCors(c => c.AddPolicy("Tangy", b =>
      .AllowAnyHeader();
 }));
 StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe")["secret"];
-
-
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 
