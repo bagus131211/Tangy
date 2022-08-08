@@ -13,7 +13,7 @@
 }
 else
 {
-    @if (!carts.Any())
+    if (!carts.Any())
     {
         <div>Please add items to cart.</div>
     }
@@ -114,12 +114,15 @@ else
     async Task LoadCart()
     {
         total = 0;
-        carts = await _storageService.GetItemAsync<List<ShoppingCart>>(Constants.ShoppingCart);
-        foreach (var cart in carts)
+        carts = await _storageService.GetItemAsync<List<ShoppingCart>>(Constants.ShoppingCart) ?? new();
+        if (carts is not null)
         {
-            cart.Product = products.FirstOrDefault(f => f.Id == cart.ProductId);
-            cart.ProductPrice = cart.Product.ProductPrices.FirstOrDefault(f => f.Id == cart.ProductPriceId);
-            total += cart.ProductPrice.Price * cart.Count;
+            foreach (var cart in carts)
+            {
+                cart.Product = products.FirstOrDefault(f => f.Id == cart.ProductId);
+                cart.ProductPrice = cart.Product.ProductPrices.FirstOrDefault(f => f.Id == cart.ProductPriceId);
+                total += cart.ProductPrice.Price * cart.Count;
+            }
         }
     }
 
